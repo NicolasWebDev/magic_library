@@ -26,6 +26,6 @@
     "jest": "^22.2.1"
   },
   "dependencies": {
-    "puppeteer": "^1.0.0"
+    "node-fetch": "^2.0.0"
   }
 }

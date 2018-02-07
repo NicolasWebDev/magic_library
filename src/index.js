@@ -1,17 +1,27 @@
 import 'babel-polyfill'
-import puppeteer from 'puppeteer'
+import { JSDOM } from 'jsdom'
+import fetch from 'node-fetch'
 
-const launchArgs = {
-  headless: false,
-  args: ['--no-sandbox', '--disable-notifications'],
-  slowMo: 50
-};
+const downloadHtml = async (givenUrl) => {
+  return (await fetch(givenUrl)).text()
+}
+
+const remoteDocument = async (url) => {
+  return JSDOM.fragment(await downloadHtml(url))
+}
 
 (async () => {
-  const browser = await puppeteer.launch(launchArgs)
-  const page = await browser.newPage()
-  await page.goto('https://amazon.com')
-  await page.screenshot({path: 'example.png'})
-
-  await browser.close()
+  const bookUrl = process.argv[2]
+  const document = await remoteDocument(bookUrl)
+  const bookTitle = document.querySelector('#ebooksProductTitle')
+    .textContent
+  const reviewsRating = document
+    .querySelector('#acrPopover')
+    .getAttribute('title')
+    .replace(/(\d\.\d) out of 5 stars/, '$1').valueOf()
+  const reviewsCount = document
+    .querySelector('#acrCustomerReviewText')
+    .textContent
+    .replace(/(\d) customer reviews/, '$1').valueOf()
+  console.log([bookTitle, reviewsRating, reviewsCount])
 })()

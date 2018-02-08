@@ -1,5 +1,7 @@
 import helpers from './helpers'
 
+const AUTHORS_FALSE_POSITIVES = ['search results', 'Learn about Author Central']
+
 export default class AmazonBook {
   constructor (document) {
     this.document = document
@@ -41,7 +43,7 @@ export default class AmazonBook {
   reviewsCount () {
     return this.queryFirstSelector('#acrCustomerReviewText', '#cmrs-atf')
       .textContent
-      .replace(/(\d) customer reviews/, '$1')
+      .replace(/(\d) customer reviews?/, '$1')
   }
 
   title () {
@@ -54,7 +56,7 @@ export default class AmazonBook {
       this.document.querySelectorAll('.author a.a-link-normal')
     )
       .filter(
-        elt => elt.textContent !== 'search results' &&
+        elt => !AUTHORS_FALSE_POSITIVES.includes(elt.textContent) &&
         (elt.hasAttribute('data-asin') || elt.href.match(/author/))
       )
       .map(elt => elt.textContent).join(', ')

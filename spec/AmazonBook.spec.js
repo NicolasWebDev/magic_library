@@ -20,9 +20,11 @@ describe('AmazonBook', () => {
   })
 
   describe('reviewsCount', () => {
-    it('returns the number of reviews', () => {
+    it('returns the number of reviews', async () => {
       expect(ebook.reviewsCount()).toBe('6')
       expect(book.reviewsCount()).toEqual('19')
+      const book2 = await AmazonBook.buildFromFile('./spec/book2.html')
+      expect(book2.reviewsCount()).toEqual('1')
     })
   })
 
@@ -34,9 +36,11 @@ describe('AmazonBook', () => {
   })
 
   describe('authors', () => {
-    it('returns the authors as a formatted string', () => {
+    it('returns the authors as a formatted string', async () => {
       expect(ebook.authors()).toBe('Lyssa Adkins')
       expect(book.authors()).toBe('Henrik Kniberg, Mattias Skarin')
+      const book3 = await AmazonBook.buildFromFile('./spec/book3.html')
+      expect(book3.authors()).toBe('Mitch Lacey')
     })
   })
 

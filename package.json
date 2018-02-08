@@ -5,8 +5,8 @@
   "main": "index.js",
   "scripts": {
     "test": "yarn jest",
-    "start": "yarn build && node lib/index.js",
-    "build": "babel src --out-dir lib"
+    "start": "yarn -s build && node lib/index.js",
+    "build": "babel src --out-dir lib -q"
   },
   "keywords": [],
   "license": "ISC",

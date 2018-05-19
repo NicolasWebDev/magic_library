@@ -1,12 +1,37 @@
 import AmazonBook from '../src/AmazonBook'
 import helpers from '../src/helpers'
 
+const mockOn = (object, methodName, returnValue) => jest
+  .spyOn(object, methodName)
+  .mockReturnValue(returnValue)
+
 describe('AmazonBook', () => {
   let book, ebook
 
   beforeEach(async () => {
     ebook = await AmazonBook.buildFromFile('./spec/ebook.html')
     book = await AmazonBook.buildFromFile('./spec/book.html')
+  })
+
+  afterEach(() => {
+    jest.restoreAllMocks()
+  })
+
+  describe('validateDocumentIsNotCaptcha', () => {
+    it('throws a CaptchaError if the document is a captcha', async () => {
+      const document = await helpers.localDocument('./spec/captcha_page.html')
+      expect(() => { AmazonBook.validateDocumentIsNotCaptcha(document) })
+        .toThrow('CaptchaError')
+    })
+  })
+
+  describe('constructor', () => {
+    it('calls validateDocumentIsNotCaptcha', () => {
+      const mock = mockOn(AmazonBook, 'validateDocumentIsNotCaptcha')
+      /* eslint-disable-next-line no-new */
+      new AmazonBook('chien')
+      expect(mock).toHaveBeenCalledWith('chien')
+    })
   })
 
   describe('title', () => {
@@ -57,19 +82,19 @@ describe('AmazonBook', () => {
 
   describe('buildFormUrl', () => {
     it('calls helpers.remoteDocument', async () => {
-      const spy = jest.spyOn(helpers, 'remoteDocument')
-        .mockImplementation(() => {})
+      const mock = mockOn(helpers, 'remoteDocument')
+      mockOn(AmazonBook, 'validateDocumentIsNotCaptcha')
       await AmazonBook.buildFromUrl('dummy')
-      expect(spy).toHaveBeenCalledWith('dummy')
+      expect(mock).toHaveBeenCalledWith('dummy')
     })
   })
 
   describe('buildFromFile', () => {
     it('calls helpers.remoteDocument', async () => {
-      const spy = jest.spyOn(helpers, 'localDocument')
-        .mockImplementation(() => {})
+      const mock = mockOn(helpers, 'localDocument')
+      mockOn(AmazonBook, 'validateDocumentIsNotCaptcha')
       await AmazonBook.buildFromFile('dummy')
-      expect(spy).toHaveBeenCalledWith('dummy')
+      expect(mock).toHaveBeenCalledWith('dummy')
     })
   })
 })

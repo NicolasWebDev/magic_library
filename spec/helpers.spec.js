@@ -1,5 +1,4 @@
 import helpers from '../src/helpers'
-import fetch from 'node-fetch'
 
 jest.mock('node-fetch')
 
@@ -11,10 +10,5 @@ describe('helpers', () => {
       helpers.remoteDocument('dummyInput')
       expect(spy).toHaveBeenCalledWith('dummyInput')
     })
-  })
-
-  describe('downloadHtml', () => {
-    helpers.downloadHtml('dummyInput')
-    expect(fetch).toHaveBeenCalledWith('dummyInput')
   })
 })

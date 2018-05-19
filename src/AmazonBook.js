@@ -4,7 +4,14 @@ const AUTHORS_FALSE_POSITIVES = ['search results', 'Learn about Author Central']
 
 export default class AmazonBook {
   constructor (document) {
+    this.constructor.validateDocumentIsNotCaptcha(document)
     this.document = document
+  }
+
+  static validateDocumentIsNotCaptcha (document) {
+    if (document.querySelector('form[action="/errors/validateCaptcha"]')) {
+      throw new Error('CaptchaError')
+    }
   }
 
   static async buildFromUrl (url) {

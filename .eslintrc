@@ -1,6 +1,6 @@
 {
-    "extends": "standard",
-    "env": {
-        "jest": true
-    }
+  "extends": ["plugin:prettier/recommended"],
+  "env": {
+    "jest": true
+  }
 }

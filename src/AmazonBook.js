@@ -23,16 +23,16 @@ export default class AmazonBook {
   }
 
   // Returns the first selector that has been found.
-  queryFirstSelector(...selectors) {
+  static queryFirstSelector(document, ...selectors) {
     let result
     for (let selector of selectors) {
-      result = this.document.querySelector(selector)
+      result = document.querySelector(selector)
       if (result) return result
     }
   }
 
   // Returns the first attribute of the element that exists.
-  getFirstAttribute(element, ...attributes) {
+  static getFirstAttribute(element, ...attributes) {
     for (let attribute of attributes) {
       if (element.hasAttribute(attribute)) {
         return element.getAttribute(attribute)
@@ -41,30 +41,39 @@ export default class AmazonBook {
   }
 
   reviewsRating() {
-    const element = this.queryFirstSelector(
+    const element = this.constructor.queryFirstSelector(
+      this.document,
       '#acrPopover',
       '#cmrsSummary-popover-data-holder'
     )
-    return Number.parseFloat(
-      this.getFirstAttribute(element, 'title', 'data-title').replace(
-        /(\d\.\d) out of 5 stars/,
-        '$1'
-      )
-    )
+    return element
+      ? Number.parseFloat(
+          this.constructor
+            .getFirstAttribute(element, 'title', 'data-title')
+            .replace(/(\d\.\d) out of 5 stars/, '$1')
+        )
+      : undefined
   }
 
   reviewsCount() {
-    return Number.parseInt(
-      this.queryFirstSelector(
-        '#acrCustomerReviewText',
-        '#cmrs-atf'
-      ).textContent.replace(/(\d) customer reviews?/, '$1')
+    const reviewsElement = this.constructor.queryFirstSelector(
+      this.document,
+      '#acrCustomerReviewText',
+      '#cmrs-atf'
     )
+    return reviewsElement
+      ? Number.parseInt(
+          reviewsElement.textContent.replace(/(\d) customer reviews?/, '$1')
+        )
+      : 0
   }
 
   title() {
-    return this.queryFirstSelector('#ebooksProductTitle', '#productTitle')
-      .textContent
+    return this.constructor.queryFirstSelector(
+      this.document,
+      '#ebooksProductTitle',
+      '#productTitle'
+    ).textContent
   }
 
   authors() {
@@ -80,7 +89,7 @@ export default class AmazonBook {
   toString() {
     return (
       `${this.title()}, by ${this.authors().join(', ')}` +
-      ` *${this.reviewsRating()}/${this.reviewsCount()}`
+      ` *${this.reviewsRating() || 0}/${this.reviewsCount()}`
     )
   }
 

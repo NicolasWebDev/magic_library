@@ -5,11 +5,14 @@ const mockOn = (object, methodName, returnValue) =>
   jest.spyOn(object, methodName).mockReturnValue(returnValue)
 
 describe('AmazonBook', () => {
-  let book, ebook
+  let book, ebook, bookWithoutReviews
 
   beforeEach(async () => {
     ebook = await AmazonBook.buildFromFile('./spec/ebook.html')
     book = await AmazonBook.buildFromFile('./spec/book.html')
+    bookWithoutReviews = await AmazonBook.buildFromFile(
+      './spec/bookWithoutReviews.html'
+    )
   })
 
   afterEach(() => {
@@ -54,6 +57,7 @@ describe('AmazonBook', () => {
       expect(book.reviewsCount()).toEqual(19)
       const book2 = await AmazonBook.buildFromFile('./spec/book2.html')
       expect(book2.reviewsCount()).toEqual(1)
+      expect(bookWithoutReviews.reviewsCount()).toEqual(0)
     })
   })
 
@@ -61,6 +65,7 @@ describe('AmazonBook', () => {
     it('returns the average rating of the reviews', () => {
       expect(ebook.reviewsRating()).toBe(4.0)
       expect(book.reviewsRating()).toBe(4.7)
+      expect(bookWithoutReviews.reviewsRating()).toBe(undefined)
     })
   })
 
@@ -106,6 +111,9 @@ describe('AmazonBook', () => {
         'Kanban and Scrum - Making the Most of' +
           ' Both (Enterprise Software Development), by Henrik Kniberg,' +
           ' Mattias Skarin *4.7/19'
+      )
+      expect(bookWithoutReviews.toString()).toBe(
+        'Training the Ear Volume 2, by Armen donelian *0/0'
       )
     })
   })

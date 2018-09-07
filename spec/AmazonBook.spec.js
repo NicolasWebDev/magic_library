@@ -4,15 +4,15 @@ import helpers from '../src/helpers'
 const mockOn = (object, methodName, returnValue) =>
   jest.spyOn(object, methodName).mockReturnValue(returnValue)
 
+const bookWithoutReviews = () =>
+  AmazonBook.buildFromFile('./spec/bookWithoutReviews.html')
+
 describe('AmazonBook', () => {
-  let book, ebook, bookWithoutReviews
+  let book, ebook
 
   beforeEach(async () => {
     ebook = await AmazonBook.buildFromFile('./spec/ebook.html')
     book = await AmazonBook.buildFromFile('./spec/book.html')
-    bookWithoutReviews = await AmazonBook.buildFromFile(
-      './spec/bookWithoutReviews.html'
-    )
   })
 
   afterEach(() => {
@@ -57,15 +57,15 @@ describe('AmazonBook', () => {
       expect(book.reviewsCount()).toEqual(19)
       const book2 = await AmazonBook.buildFromFile('./spec/book2.html')
       expect(book2.reviewsCount()).toEqual(1)
-      expect(bookWithoutReviews.reviewsCount()).toEqual(0)
+      expect((await bookWithoutReviews()).reviewsCount()).toEqual(0)
     })
   })
 
   describe('reviewsRating', () => {
-    it('returns the average rating of the reviews', () => {
+    it('returns the average rating of the reviews', async () => {
       expect(ebook.reviewsRating()).toBe(4.0)
       expect(book.reviewsRating()).toBe(4.7)
-      expect(bookWithoutReviews.reviewsRating()).toBe(undefined)
+      expect((await bookWithoutReviews()).reviewsRating()).toBe(undefined)
     })
   })
 
@@ -101,7 +101,7 @@ describe('AmazonBook', () => {
   })
 
   describe('toString', () => {
-    it('returns the line I use in my file', () => {
+    it('returns the line I use in my file', async () => {
       expect(ebook.toString()).toBe(
         'Coaching Agile Teams: A Companion for' +
           ' ScrumMasters, Agile Coaches, and Project Managers in Transition' +
@@ -112,7 +112,7 @@ describe('AmazonBook', () => {
           ' Both (Enterprise Software Development), by Henrik Kniberg,' +
           ' Mattias Skarin *4.7/19'
       )
-      expect(bookWithoutReviews.toString()).toBe(
+      expect((await bookWithoutReviews()).toString()).toBe(
         'Training the Ear Volume 2, by Armen donelian *0/0'
       )
     })

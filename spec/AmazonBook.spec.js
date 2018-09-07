@@ -1,9 +1,8 @@
 import AmazonBook from '../src/AmazonBook'
 import helpers from '../src/helpers'
 
-const mockOn = (object, methodName, returnValue) => jest
-  .spyOn(object, methodName)
-  .mockReturnValue(returnValue)
+const mockOn = (object, methodName, returnValue) =>
+  jest.spyOn(object, methodName).mockReturnValue(returnValue)
 
 describe('AmazonBook', () => {
   let book, ebook
@@ -20,8 +19,9 @@ describe('AmazonBook', () => {
   describe('validateDocumentIsNotCaptcha', () => {
     it('throws a CaptchaError if the document is a captcha', async () => {
       const document = await helpers.localDocument('./spec/captcha_page.html')
-      expect(() => { AmazonBook.validateDocumentIsNotCaptcha(document) })
-        .toThrow('CaptchaError')
+      expect(() => {
+        AmazonBook.validateDocumentIsNotCaptcha(document)
+      }).toThrow('CaptchaError')
     })
   })
 
@@ -36,47 +36,77 @@ describe('AmazonBook', () => {
 
   describe('title', () => {
     it('returns the title', async () => {
-      expect(ebook.title()).toEqual('Coaching Agile Teams: A Companion for ' +
-        'ScrumMasters, Agile Coaches, and Project Managers in Transition ' +
-        '(Addison-Wesley Signature Series (Cohn))')
-      expect(book.title()).toEqual('Kanban and Scrum - Making the Most of' +
-        ' Both (Enterprise Software Development)')
+      expect(ebook.title()).toEqual(
+        'Coaching Agile Teams: A Companion for ' +
+          'ScrumMasters, Agile Coaches, and Project Managers in Transition ' +
+          '(Addison-Wesley Signature Series (Cohn))'
+      )
+      expect(book.title()).toEqual(
+        'Kanban and Scrum - Making the Most of' +
+          ' Both (Enterprise Software Development)'
+      )
     })
   })
 
   describe('reviewsCount', () => {
     it('returns the number of reviews', async () => {
-      expect(ebook.reviewsCount()).toBe('6')
-      expect(book.reviewsCount()).toEqual('19')
+      expect(ebook.reviewsCount()).toBe(6)
+      expect(book.reviewsCount()).toEqual(19)
       const book2 = await AmazonBook.buildFromFile('./spec/book2.html')
-      expect(book2.reviewsCount()).toEqual('1')
+      expect(book2.reviewsCount()).toEqual(1)
     })
   })
 
   describe('reviewsRating', () => {
     it('returns the average rating of the reviews', () => {
-      expect(ebook.reviewsRating()).toBe('4.0')
-      expect(book.reviewsRating()).toBe('4.7')
+      expect(ebook.reviewsRating()).toBe(4.0)
+      expect(book.reviewsRating()).toBe(4.7)
     })
   })
 
   describe('authors', () => {
     it('returns the authors as a formatted string', async () => {
-      expect(ebook.authors()).toBe('Lyssa Adkins')
-      expect(book.authors()).toBe('Henrik Kniberg, Mattias Skarin')
+      expect(ebook.authors()).toEqual(['Lyssa Adkins'])
+      expect(book.authors()).toEqual(['Henrik Kniberg', 'Mattias Skarin'])
       const book3 = await AmazonBook.buildFromFile('./spec/book3.html')
-      expect(book3.authors()).toBe('Mitch Lacey')
+      expect(book3.authors()).toEqual(['Mitch Lacey'])
+    })
+  })
+
+  describe('toJSON', () => {
+    it('returns the data as JSON', () => {
+      expect(ebook.toJSON()).toEqual({
+        title:
+          'Coaching Agile Teams: A Companion for ScrumMasters, Agile' +
+          ' Coaches, and Project Managers in Transition (Addison-Wesley' +
+          ' Signature Series (Cohn))',
+        authors: ['Lyssa Adkins'],
+        reviewsCount: 6,
+        reviewsRating: 4.0
+      })
+      expect(book.toJSON()).toEqual({
+        title:
+          'Kanban and Scrum - Making the Most of Both (Enterprise' +
+          ' Software Development)',
+        authors: ['Henrik Kniberg', 'Mattias Skarin'],
+        reviewsCount: 19,
+        reviewsRating: 4.7
+      })
     })
   })
 
   describe('toString', () => {
     it('returns the line I use in my file', () => {
-      expect(ebook.toString()).toBe('Coaching Agile Teams: A Companion for' +
-        ' ScrumMasters, Agile Coaches, and Project Managers in Transition' +
-        ' (Addison-Wesley Signature Series (Cohn)), by Lyssa Adkins *4.0/6')
-      expect(book.toString()).toBe('Kanban and Scrum - Making the Most of' +
-        ' Both (Enterprise Software Development), by Henrik Kniberg,' +
-        ' Mattias Skarin *4.7/19')
+      expect(ebook.toString()).toBe(
+        'Coaching Agile Teams: A Companion for' +
+          ' ScrumMasters, Agile Coaches, and Project Managers in Transition' +
+          ' (Addison-Wesley Signature Series (Cohn)), by Lyssa Adkins *4/6'
+      )
+      expect(book.toString()).toBe(
+        'Kanban and Scrum - Making the Most of' +
+          ' Both (Enterprise Software Development), by Henrik Kniberg,' +
+          ' Mattias Skarin *4.7/19'
+      )
     })
   })
 
